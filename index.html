@@ -33,14 +33,17 @@
         </div>
       </div>
       <div class="top-actions">
-        <button class="icon-btn" id="themeBtn" type="button" title="切换主题" aria-label="切换主题">◐</button>
+        <button class="icon-btn" id="themeBtn" type="button" title="切换深色" aria-label="切换深色">☾</button>
         <button class="icon-btn" id="settingsBtn" type="button" title="设置与导入" aria-label="打开设置">⚙</button>
       </div>
     </header>
 
     <main class="shell">
       <section class="hero">
-        <time id="clock" datetime="">00:00</time>
+        <time id="clock" class="clock" datetime="">
+          <span class="clock-scan" aria-hidden="true"></span>
+          <span class="clock-row" id="clockRow"></span>
+        </time>
         <p class="date-line"><span id="greeting">你好</span><span class="dot">·</span><span id="dateText"></span></p>
         <form class="search" id="searchForm" autocomplete="off" action="#">
           <label class="sr-only" for="q">搜索书签或网页</label>

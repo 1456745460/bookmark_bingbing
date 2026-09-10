@@ -171,13 +171,150 @@ select {
   padding: 28px 0 18px;
 }
 
-#clock {
-  display: block;
-  font-size: clamp(56px, 9vw, 92px);
+.clock {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  font-family: ui-monospace, "SF Mono", Menlo, "Cascadia Mono", "JetBrains Mono", monospace;
+  font-size: clamp(44px, 7.5vw, 84px);
   font-weight: 500;
-  letter-spacing: -0.04em;
   line-height: 1;
+  color: var(--ink);
+}
+
+.clock-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.08em;
+}
+
+.clock-digit {
+  position: relative;
+  width: 0.72em;
+  height: 1.14em;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, var(--line));
+  border-radius: 0.16em;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 16%, transparent), transparent 42%),
+    var(--card);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 18px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.clock-digit::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: color-mix(in srgb, var(--ink) 16%, transparent);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.digit-now,
+.digit-next {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
   font-variant-numeric: tabular-nums;
+}
+
+.digit-next {
+  transform: translateY(115%);
+  opacity: 0;
+}
+
+.clock-digit.is-flip .digit-now {
+  animation: digit-out 0.42s cubic-bezier(0.18, 0.82, 0.22, 1) forwards;
+}
+
+.clock-digit.is-flip .digit-next {
+  animation: digit-in 0.42s cubic-bezier(0.18, 0.82, 0.22, 1) forwards;
+}
+
+@keyframes digit-out {
+  to {
+    transform: translateY(-118%) scaleY(0.55);
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+
+@keyframes digit-in {
+  from {
+    transform: translateY(118%) scaleY(0.55);
+    opacity: 0;
+    filter: blur(2px);
+  }
+  to {
+    transform: none;
+    opacity: 1;
+    filter: none;
+  }
+}
+
+.clock-colon {
+  width: 0.32em;
+  color: var(--accent);
+  text-align: center;
+  text-shadow: 0 0 8px var(--accent), 0 0 22px color-mix(in srgb, var(--accent) 55%, transparent);
+  animation: colon-blink 1s step-end infinite;
+  transform: translateY(-0.02em);
+}
+
+@keyframes colon-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0.18;
+  }
+}
+
+.clock-scan {
+  position: absolute;
+  inset: -12% 6%;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in srgb, var(--accent) 22%, transparent),
+    transparent
+  );
+  animation: clock-scan 3.4s linear infinite;
+  opacity: 0.5;
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+@keyframes clock-scan {
+  from {
+    transform: translateY(-80%);
+  }
+  to {
+    transform: translateY(80%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clock-digit.is-flip .digit-now,
+  .clock-digit.is-flip .digit-next,
+  .clock-colon,
+  .clock-scan {
+    animation: none;
+  }
+
+  .digit-next {
+    display: none;
+  }
 }
 
 .date-line {
@@ -500,8 +637,13 @@ select {
     padding: 10px 0 8px;
   }
 
-  #clock {
-    font-size: clamp(40px, 12vw, 56px);
+  .clock {
+    font-size: clamp(32px, 10vw, 48px);
+  }
+
+  .clock-digit {
+    width: 0.7em;
+    height: 1.12em;
   }
 
   .date-line {

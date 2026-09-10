@@ -31,6 +31,7 @@
   const $ = (id) => document.getElementById(id);
   const els = {
     clock: $("clock"),
+    clockRow: $("clockRow"),
     dateText: $("dateText"),
     greeting: $("greeting"),
     q: $("q"),
@@ -77,19 +78,72 @@
     localStorage.setItem(key, JSON.stringify(value));
   }
 
+  function resolvedTheme() {
+    if (state.theme === "dark" || state.theme === "light") return state.theme;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+
   function applyTheme() {
-    const preferDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const theme = state.theme === "system" ? (preferDark ? "dark" : "light") : state.theme;
+    const theme = resolvedTheme();
     document.documentElement.dataset.theme = theme;
     els.themeSelect.value = state.theme;
+    const isLight = theme === "light";
+    els.themeBtn.textContent = isLight ? "☾" : "☀";
+    els.themeBtn.title = isLight ? "切换深色" : "切换浅色";
+    els.themeBtn.setAttribute("aria-label", els.themeBtn.title);
+  }
+
+  function ensureClock() {
+    if (els.clockRow.childElementCount) return;
+    ["h", "h", ":", "m", "m", ":", "s", "s"].forEach((kind) => {
+      if (kind === ":") {
+        const colon = document.createElement("span");
+        colon.className = "clock-colon";
+        colon.setAttribute("aria-hidden", "true");
+        colon.textContent = ":";
+        els.clockRow.appendChild(colon);
+        return;
+      }
+      const digit = document.createElement("span");
+      digit.className = "clock-digit";
+      digit.innerHTML = '<span class="digit-now">0</span><span class="digit-next" aria-hidden="true">0</span>';
+      els.clockRow.appendChild(digit);
+    });
+  }
+
+  function setDigit(el, value) {
+    const current = el.querySelector(".digit-now");
+    if (current.dataset.v === value) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!current.dataset.v || reduce) {
+      current.textContent = value;
+      current.dataset.v = value;
+      return;
+    }
+    const next = el.querySelector(".digit-next");
+    next.textContent = value;
+    el.classList.remove("is-flip");
+    void el.offsetWidth;
+    el.classList.add("is-flip");
+    window.clearTimeout(el._flipTimer);
+    el._flipTimer = window.setTimeout(() => {
+      current.textContent = value;
+      current.dataset.v = value;
+      el.classList.remove("is-flip");
+    }, 420);
   }
 
   function tick() {
     const now = new Date();
     const hh = String(now.getHours()).padStart(2, "0");
     const mm = String(now.getMinutes()).padStart(2, "0");
-    els.clock.textContent = `${hh}:${mm}`;
+    const ss = String(now.getSeconds()).padStart(2, "0");
+    ensureClock();
     els.clock.dateTime = now.toISOString();
+    const stamp = `${hh}${mm}${ss}`;
+    [...els.clockRow.querySelectorAll(".clock-digit")].forEach((el, index) => {
+      setDigit(el, stamp[index]);
+    });
     const week = "日一二三四五六"[now.getDay()];
     els.dateText.textContent = `${now.getMonth() + 1}月${now.getDate()}日 星期${week}`;
     const h = now.getHours();
@@ -259,8 +313,7 @@
   }
 
   function cycleTheme() {
-    const order = ["system", "dark", "light"];
-    state.theme = order[(order.indexOf(state.theme) + 1) % order.length];
+    state.theme = resolvedTheme() === "light" ? "dark" : "light";
     localStorage.setItem(STORAGE.theme, state.theme);
     applyTheme();
   }
@@ -544,10 +597,14 @@
     els.q.placeholder = isCoarsePointer() ? "搜索书签或网页" : "搜索书签，或直接回车搜索网页";
   }
 
+  function loopClock() {
+    tick();
+    window.setTimeout(loopClock, 1000 - (Date.now() % 1000));
+  }
+
   loadData();
   applyTheme();
-  tick();
-  setInterval(tick, 1000);
+  loopClock();
   bind();
   setPlaceholder();
   if (!isCoarsePointer()) els.q.focus();
