@@ -55,7 +55,7 @@
   const state = {
     engine: localStorage.getItem(STORAGE.engine) || "bookmarks",
     theme: localStorage.getItem(STORAGE.theme) || "system",
-    category: localStorage.getItem(STORAGE.category) || "all",
+    category: "书签栏",
     pins: readJson(STORAGE.pins, []),
     freq: readJson(STORAGE.freq, {}),
     query: "",
@@ -158,7 +158,9 @@
       { id: "freq", label: "常用", icon: "★", count: flatten(state.data).filter((i) => state.pins.includes(i.id) || state.freq[i.id]).length },
       ...state.data.categories,
     ];
-    if (!cats.some((c) => c.id === state.category)) state.category = "all";
+    if (!cats.some((c) => c.id === state.category)) {
+      state.category = cats.some((c) => c.id === "书签栏") ? "书签栏" : "all";
+    }
     els.cats.innerHTML = cats
       .map(
         (cat) =>
@@ -394,7 +396,7 @@
     }
     writeJson(STORAGE.override, payload);
     loadData();
-    state.category = "all";
+    state.category = payload.categories.some((c) => c.id === "书签栏") ? "书签栏" : "all";
     render();
     els.drawer.hidden = true;
   }
