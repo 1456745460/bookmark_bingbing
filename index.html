@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#12100d" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+    <title>启页 · 书签导航</title>
+    <meta name="description" content="个人书签导航首页，支持搜索、分类，以及用浏览器导出的 HTML 更新。" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./favicon.svg" />
+    <link rel="stylesheet" href="./assets/css/style.css" />
+  </head>
+  <body>
+    <div class="bg" aria-hidden="true"></div>
+    <div class="drop-mask" id="dropMask" hidden>
+      <div class="drop-card">
+        <p>松开以导入书签 HTML</p>
+        <span>Chrome / Edge / Firefox 导出的书签文件</span>
+      </div>
+    </div>
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <div>
+          <strong>启页</strong>
+          <span id="sourceHint">书签导航</span>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" id="themeBtn" type="button" title="切换主题" aria-label="切换主题">◐</button>
+        <button class="icon-btn" id="settingsBtn" type="button" title="设置与导入" aria-label="打开设置">⚙</button>
+      </div>
+    </header>
+
+    <main class="shell">
+      <section class="hero">
+        <time id="clock" datetime="">00:00</time>
+        <p class="date-line"><span id="greeting">你好</span><span class="dot">·</span><span id="dateText"></span></p>
+        <form class="search" id="searchForm" autocomplete="off" action="#">
+          <label class="sr-only" for="q">搜索书签或网页</label>
+          <input id="q" name="q" type="search" enterkeyhint="search" placeholder="搜索书签或网页" />
+          <kbd class="hint-key">/</kbd>
+        </form>
+        <div class="engines" id="engines" role="tablist" aria-label="搜索引擎"></div>
+      </section>
+
+      <div class="tools">
+        <nav class="cats" id="cats" aria-label="书签分类"></nav>
+      </div>
+      <p class="status" id="status"></p>
+      <section class="grid" id="grid" aria-live="polite"></section>
+    </main>
+
+    <footer class="foot">
+      <span class="desk-only">↑↓ 选择</span>
+      <span class="desk-only">Enter 打开</span>
+      <span class="desk-only">/ 搜索</span>
+      <span class="desk-only">把最新的 bookmarks.html 拖到页面上即可临时更新</span>
+      <span class="mobile-only">点分类筛选 · 点星星固定常用 · 设置里可导入书签</span>
+    </footer>
+
+    <aside class="drawer" id="drawer" hidden>
+      <div class="drawer-panel" role="dialog" aria-labelledby="drawerTitle">
+        <header>
+          <h2 id="drawerTitle">设置</h2>
+          <button class="icon-btn" id="closeDrawer" type="button" aria-label="关闭">✕</button>
+        </header>
+        <label class="field">
+          默认搜索引擎
+          <select id="engineSelect"></select>
+        </label>
+        <label class="field">
+          主题
+          <select id="themeSelect">
+            <option value="system">跟随系统</option>
+            <option value="dark">深色</option>
+            <option value="light">浅色</option>
+          </select>
+        </label>
+        <div class="import-box">
+          <h3>更新书签</h3>
+          <p>导出浏览器书签为 HTML，然后选择文件或拖到本页。本地导入只保存在当前浏览器，仓库更新请运行 <code>python3 scripts/update.py</code> 后推送到 GitHub。</p>
+          <label class="file-btn">
+            选择 bookmarks.html
+            <input id="fileInput" type="file" accept=".html,.htm,text/html" hidden />
+          </label>
+          <button class="text-btn" id="resetOverride" type="button">恢复仓库版本</button>
+        </div>
+        <p class="meta" id="dataMeta"></p>
+      </div>
+    </aside>
+
+    <script src="./assets/js/bookmarks.js"></script>
+    <script src="./assets/js/app.js"></script>
+  </body>
+</html>
